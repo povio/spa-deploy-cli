@@ -4,13 +4,6 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import {
-  CloudFrontClient,
-  CreateInvalidationCommand,
-} from "@aws-sdk/client-cloudfront";
-import { fromIni } from "@aws-sdk/credential-provider-ini";
-import { fromEnv } from "@aws-sdk/credential-provider-env";
-import { GetCallerIdentityCommand, STSClient } from "@aws-sdk/client-sts";
 import { lookup } from "mime-types";
 import { isMatch } from "micromatch";
 import fs from "fs";
@@ -22,42 +15,20 @@ import {
   SyncAction,
   SyncActionColors,
 } from "./sync.helper";
-
-import { logInfo } from "@povio/node-stage/cli";
-import { chk } from "@povio/node-stage/chalk";
-
-function getCredentials() {
-  if (process.env.AWS_PROFILE) {
-    return fromIni();
-  }
-  return fromEnv();
-}
-
-export async function getAwsIdentity(options: { region: string }) {
-  const stsClient = new STSClient({
-    credentials: getCredentials(),
-    region: options.region,
-  });
-  return await stsClient.send(new GetCallerIdentityCommand({}));
-}
+import { chk } from "./chalk.helper";
+import { logInfo } from "./cli.helper";
+import { getCredentials } from "./aws.helper";
 
 export function getS3ClientInstance(options: {
   region: string;
   endpoint?: string;
 }) {
   return new S3Client({
-    credentials: getCredentials(),
+    credentials: getCredentials({ region: options.region }),
     region: options.region,
     ...(options.endpoint
       ? { forcePathStyle: true, endpoint: options.endpoint }
       : {}),
-  });
-}
-
-export function getCloudfrontClientInstance(options: { region: string }) {
-  return new CloudFrontClient({
-    credentials: getCredentials(),
-    region: options.region,
   });
 }
 
@@ -94,13 +65,13 @@ export async function* scanS3Files(
   options: {
     bucket: string;
     prefix: string | undefined;
-  }
+  },
 ) {
   for await (const data of paginateListObjectsV2(
     {
       client,
     },
-    { Bucket: options.bucket, Prefix: options.prefix }
+    { Bucket: options.bucket, Prefix: options.prefix },
   )) {
     if (data.Contents) {
       for (const x of data.Contents) {
@@ -140,12 +111,11 @@ export type S3SyncPlan = {
 export function printS3SyncPlan(
   plan: S3SyncPlan,
   print = true,
-  verbose = false
+  verbose = false,
 ) {
-  const output = [];
+  const output: string[] = [];
   for (const item of plan.items) {
-    const { key, action, invalidate, cache, local, contentType, data, remote } =
-      item;
+    const { key, action, invalidate, cache, local, contentType, data } = item;
     if (!verbose) {
       if (action == SyncAction.unchanged) {
         continue;
@@ -178,7 +148,7 @@ export function printS3SyncPlan(
 }
 export async function prepareS3SyncPlan(
   localOptions: ScanLocalOptions,
-  s3Options: SyncS3Options
+  s3Options: SyncS3Options,
 ): Promise<S3SyncPlan> {
   const itemsDict: Record<string, S3SyncPlanItem> = {};
 
@@ -289,7 +259,7 @@ export async function executeS3SyncPlan(plan: S3SyncPlan) {
     const {
       key,
       action,
-      acl,
+      // acl,
       cacheControl,
       contentType,
       contentDisposition,
@@ -304,12 +274,12 @@ export async function executeS3SyncPlan(plan: S3SyncPlan) {
           new PutObjectCommand({
             Bucket: bucket,
             Key: key,
-            ACL: acl,
+            //ACL: acl, todo
             CacheControl: cacheControl,
             ContentType: contentType,
             ContentDisposition: contentDisposition,
             Body: data !== undefined ? data : fs.readFileSync(local!.path),
-          })
+          }),
         );
         break;
       }
@@ -319,7 +289,7 @@ export async function executeS3SyncPlan(plan: S3SyncPlan) {
           new DeleteObjectCommand({
             Bucket: bucket,
             Key: key,
-          })
+          }),
         );
         break;
       }
@@ -327,44 +297,5 @@ export async function executeS3SyncPlan(plan: S3SyncPlan) {
         break;
       }
     }
-  }
-}
-
-export function prepareCloudfrontInvalidation(
-  plan: S3SyncPlan,
-  invalidatePaths: string[]
-): string[] {
-  const { items } = plan;
-  return [
-    ...items.reduce((acc, item) => {
-      if (item.invalidate) {
-        acc.push(`/${item.remote!.key}`);
-      }
-      return acc;
-    }, [] as string[]),
-    ...invalidatePaths,
-  ];
-}
-
-export async function executeCloudfrontInvalidation(
-  invalidations: string[],
-  distributionsId: string[],
-  region: string
-) {
-  for (const DistributionId of distributionsId) {
-    const client = getCloudfrontClientInstance({ region });
-    logInfo(`Invalidating ${DistributionId}`);
-    await client.send(
-      new CreateInvalidationCommand({
-        DistributionId,
-        InvalidationBatch: {
-          CallerReference: new Date().toISOString(),
-          Paths: {
-            Quantity: invalidations.length,
-            Items: invalidations,
-          },
-        },
-      })
-    );
   }
 }
