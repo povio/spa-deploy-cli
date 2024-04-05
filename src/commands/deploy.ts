@@ -70,6 +70,11 @@ const DeployConfigItem = z.object({
         .describe("Remove all unknown files from S3")
         .optional(),
 
+      skipChangesInvalidation: z
+        .boolean()
+        .describe("Do not mark changed files for invalidation")
+        .optional(),
+
       invalidateGlob: z
         .union([z.string(), z.string().array()])
         .transform(toArray)

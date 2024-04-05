@@ -42,13 +42,17 @@ export interface SyncS3Options {
    */
   purge?: boolean;
   /**
-   * Force replace files even if equal
+   * If true, force replace files even if equal
    */
   force?: boolean;
   /**
-   * Matched files are not cached and are invalidated on deploy
+   * If true, matched files are not cached and are invalidated on deploy
    */
   invalidateGlob?: string[];
+  /**
+   * If true, do not mark changed files for invalidation
+   */
+  skipChangesInvalidation?: boolean;
 
   acl?: string;
 }
@@ -191,6 +195,8 @@ export async function prepareS3SyncPlan(
     endpoint: s3Options.endpoint,
   });
 
+  const invalidateChanges = !s3Options.skipChangesInvalidation;
+
   for await (const file of scanS3Files(client, {
     bucket: s3Options.bucket,
     prefix: s3Options.prefix,
@@ -232,7 +238,7 @@ export async function prepareS3SyncPlan(
         itemsDict[key].action = SyncAction.unchanged;
       } else {
         // update
-        itemsDict[key].invalidate = true;
+        itemsDict[key].invalidate = invalidateChanges;
         itemsDict[key].action = SyncAction.update;
       }
     }

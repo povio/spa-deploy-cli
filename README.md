@@ -48,6 +48,8 @@ deploy:
         force: false
         # extra glob for invalidation
         #invalidateGlob: 
+        # ignore s3 changes for invalidation
+        # skipChangesInvalidation: false
           
     cloudfront:
         distributionId: CF000000000000
