@@ -19,13 +19,13 @@ Examples:
 # Setup
 
 ```bash
-yarn add spa-deploy-cli@poviolabs/spa-deploy-cli#v4
+yarn add spa-deploy-cli@poviolabs/spa-deploy-cli#v4.1
 ```
 
 or install globally
 
 ```bash
-npm i -g spa-deploy-cli@poviolabs/spa-deploy-cli#v4 --force
+npm i -g spa-deploy-cli@poviolabs/spa-deploy-cli#v4.1 --force
 ```
 
 # Configure
