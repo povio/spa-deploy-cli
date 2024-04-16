@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { logBanner, logError, logVariable, logWarning } from "./cli.helper.js";
+import { logBanner, logError, logVariable, logWarning } from "./cli.helper";
 
 async function simpleGit(p: string) {
   const { default: _simpleGit } = await import("simple-git");

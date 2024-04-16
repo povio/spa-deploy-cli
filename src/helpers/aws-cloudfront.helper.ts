@@ -23,7 +23,15 @@ export function prepareCloudfrontInvalidation(plan: S3SyncPlan): string[] {
   return [
     ...items.reduce((acc, item) => {
       if (item.invalidate) {
-        acc.push(`/${item.remote!.key}`);
+        /**
+         * Non-ASCII or unsafe characters in the path
+         * If the path includes non-ASCII characters or unsafe characters as defined in RFC 1738, URL-encode those characters. Do not URL-encode any other characters in the path, or CloudFront will not invalidate the old version of the updated file.
+         * @see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#invalidation-specifying-objects-paths
+         *
+         * Encode unsafe characters
+         */
+        const key = encodeURI(item.remote!.key);
+        acc.push(`/${key}`);
       }
       return acc;
     }, [] as string[]),

@@ -7,7 +7,7 @@ import { z } from "zod";
 import path from "path";
 import fs from "fs";
 import { dump } from "js-yaml";
-import { logWarning } from "../helpers/cli.helper.js";
+import { logWarning } from "../helpers/cli.helper";
 
 export async function bootstrap(argv: {
   pwd: string;

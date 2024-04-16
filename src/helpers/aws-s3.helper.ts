@@ -50,9 +50,9 @@ export interface SyncS3Options {
    */
   invalidateGlob?: string[];
   /**
-   * If true, do not mark changed files for invalidation
+   * If true, mark changed files for invalidation
    */
-  skipChangesInvalidation?: boolean;
+  invalidateChanges?: boolean;
 
   acl?: string;
 }
@@ -150,6 +150,7 @@ export function printS3SyncPlan(
   }
   return output.join("\n");
 }
+
 export async function prepareS3SyncPlan(
   localOptions: ScanLocalOptions,
   s3Options: SyncS3Options,
@@ -195,8 +196,6 @@ export async function prepareS3SyncPlan(
     endpoint: s3Options.endpoint,
   });
 
-  const invalidateChanges = !s3Options.skipChangesInvalidation;
-
   for await (const file of scanS3Files(client, {
     bucket: s3Options.bucket,
     prefix: s3Options.prefix,
@@ -238,7 +237,7 @@ export async function prepareS3SyncPlan(
         itemsDict[key].action = SyncAction.unchanged;
       } else {
         // update
-        itemsDict[key].invalidate = invalidateChanges;
+        itemsDict[key].invalidate = s3Options.invalidateChanges;
         itemsDict[key].action = SyncAction.update;
       }
     }

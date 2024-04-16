@@ -87,6 +87,7 @@ const DeployConfigItem = z.object({
 
   cloudfront: CloudfrontConfig.optional(),
 });
+
 const DeployConfigs = z
   .union([
     DeployConfigItem.extend({ name: z.string().optional() }),
@@ -161,6 +162,10 @@ export async function deploy(argv: {
         logVariable("deploy__s3__prefix", prefix);
       }
 
+      if (d.s3.skipChangesInvalidation) {
+        logVariable("deploy__s3__skipChangesInvalidation", true);
+      }
+
       s3SyncPlan = await prepareS3SyncPlan(
         {
           path: buildPath,
@@ -176,6 +181,7 @@ export async function deploy(argv: {
           purge: d.s3.purge || argv.purge,
           invalidateGlob: d.s3.invalidateGlob,
           acl: d.s3.acl,
+          invalidateChanges: !(d.s3.skipChangesInvalidation === true),
         },
       );
 

@@ -1,5 +1,5 @@
 import { test } from "node:test";
-import { resolveZeConfigItem } from "../src/helpers/ze-config.js";
+import { resolveZeConfigItem } from "../src/helpers/ze-config";
 import assert from "assert";
 
 test("ze-config", async () => {
@@ -11,8 +11,8 @@ test("ze-config", async () => {
 
   const config = await resolveZeConfigItem(
     {
-      name: "test",
-      destination: "./test.zeconfig.yml",
+      //name: "test",
+      //destination: "./test.zeconfig.yml",
       values: [
         { name: "database__name", value: "test" },
         { name: "database__username2", value: "test" },

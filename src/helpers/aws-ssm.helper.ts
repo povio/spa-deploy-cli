@@ -74,7 +74,7 @@ export async function getSSMParametersByPath(options: {
   try {
     let nextToken: string | undefined = undefined;
     do {
-      const response = await ssm.send(
+      const response: any = await ssm.send(
         new GetParametersByPathCommand({
           Path: `/${match.groups.path}`,
           WithDecryption: true,

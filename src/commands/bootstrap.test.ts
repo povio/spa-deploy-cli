@@ -8,12 +8,12 @@ const __dirname = new URL(".", import.meta.url).pathname;
 process.env.APP_VERSION = "0.0.1";
 
 test("bootstrap env", async () => {
-  const destination = "./.test-example.env";
+  //const destination = "./.test-example.env";
 
   const data = await resolveZeConfigItem(
     {
-      name: "test",
-      destination,
+      //name: "test",
+      //destination,
       values: [
         {
           name: "@",
@@ -29,7 +29,7 @@ test("bootstrap env", async () => {
     },
     {
       awsRegion: "us-east-1",
-      release: "xxxxxxxxx",
+      release: "semiprecious",
     },
     __dirname,
     "myapp-dev",
@@ -37,10 +37,10 @@ test("bootstrap env", async () => {
 
   assert.equal(
     generateIni(data),
-    `APP_RELEASE=xxxxxxxxx
-APP_STAGE=myapp-dev
-APP_VERSION=0.0.1
-STATIC_URL=https://static.example.com
-NEXT_PUBLIC_SENTRY_CDN=https://public@sentry.example.com/1`,
+    `APP_RELEASE="semiprecious"
+APP_STAGE="myapp-dev"
+APP_VERSION="0.0.1"
+STATIC_URL="https://static.example.com"
+NEXT_PUBLIC_SENTRY_CDN="https://public@sentry.example.com/1"`,
   );
 });
