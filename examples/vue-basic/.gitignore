@@ -14,8 +14,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-/.yarn/cache
-
 # Editor directories and files
 .idea
 .vscode
@@ -32,4 +30,3 @@ pnpm-debug.log*
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
-.yarn/versions

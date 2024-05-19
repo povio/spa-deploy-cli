@@ -5,13 +5,17 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
-.yarn/versions
+
+/dist
 
 node_modules
 
 # IDEs and editors
 .idea
 .DS_Store
+
+# packages
+povio-spa-deploy-cli-*
 
 # config
 config.local.yaml

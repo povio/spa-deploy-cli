@@ -1,7 +1,6 @@
 {
   "name": "@povio/spa-deploy-cli",
-  "version": "4.0.2",
-  "packageManager": "yarn@4.1.1",
+  "version": "4.1.0",
   "bin": {
     "spa-deploy": "./dist/sh.js"
   },
@@ -14,10 +13,12 @@
     "build": "yarn build:clean && node ./esbuild.mjs && chmod +x ./dist/sh.js",
     "build:check": "yarn tsc --project . --noEmit",
     "start:dist": "node --env-file=.env ./dist/sh.js",
-    "lint": "eslint --fix"
+    "lint": "eslint --fix",
+    "push": "yarn exec ./scripts/publish.sh"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "keywords": [
     "povio",
@@ -29,29 +30,30 @@
     "aws-amplify",
     "next-js"
   ],
-  "homepage": "https://github.com/poviolabs/spa-deploy-cli",
-  "bugs": "https://github.com/poviolabs/spa-deploy-cli/issues",
+  "homepage": "https://github.com/povio/spa-deploy-cli",
+  "bugs": "https://github.com/povio/spa-deploy-cli/issues",
   "repository": {
-    "url": "https://github.com/poviolabs/spa-deploy-cli",
+    "url": "git+https://github.com/povio/spa-deploy-cli.git",
     "type": "git"
   },
-  "contributors": [
-    "Marko Zabreznik <marko.zabreznik@povio.com>"
-  ],
+  "author": "Marko Zabreznik <marko.zabreznik@povio.com>",
+  "license": "BSD-3-Clause",
   "devDependencies": {
-    "@aws-sdk/client-cloudfront": "3.554.0",
-    "@aws-sdk/client-s3": "3.554.0",
-    "@aws-sdk/client-ssm": "3.521.0",
-    "@aws-sdk/credential-provider-node": "^3.521.0",
-    "@aws-sdk/credential-providers": "^3.554.0",
-    "@aws-sdk/types": "3.535.0",
-    "@smithy/node-config-provider": "^2.3.0",
-    "@types/diff": "^5.0.9",
+    "@aws-sdk/client-cloudfront": "3.577.0",
+    "@aws-sdk/client-s3": "3.577.0",
+    "@aws-sdk/client-ssm": "3.577.0",
+    "@aws-sdk/client-sso-oidc": "^3.577.0",
+    "@aws-sdk/client-sts": "^3.577.0",
+    "@aws-sdk/credential-provider-node": "^3.577.0",
+    "@aws-sdk/credential-providers": "^3.577.0",
+    "@aws-sdk/types": "3.577.0",
+    "@smithy/node-config-provider": "^3.0.0",
+    "@types/diff": "^5.2.1",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash.merge": "^4.6.9",
     "@types/micromatch": "^4.0.7",
     "@types/mime-types": "^2.1.4",
-    "@types/node": "^20.12.7",
+    "@types/node": "^20.12.12",
     "@types/prettier": "^3.0.0",
     "@types/prompt-sync": "^4.2.3",
     "@types/semver": "^7.5.8",
@@ -61,7 +63,7 @@
     "chalk": "^5.3.0",
     "cosmiconfig": "^9.0.0",
     "diff": "^5.2.0",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.21.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
@@ -74,14 +76,15 @@
     "prompt-sync": "^4.2.0",
     "reflect-metadata": "^0.2.2",
     "simple-git": "^3.24.0",
-    "tsx": "^4.7.2",
+    "tsx": "^4.10.5",
     "typescript": "^5.4.5",
     "yargs": "^17.7.2",
-    "zod": "^3.22.4"
+    "zod": "^3.23.8"
   },
   "engines": {
     "node": ">= 14",
     "yarn": ">= 3.2",
     "npm": ">= 8"
-  }
+  },
+  "packageManager": "yarn@4.2.2"
 }

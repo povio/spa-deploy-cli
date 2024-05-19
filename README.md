@@ -19,20 +19,14 @@ Examples:
 # Setup
 
 ```bash
-yarn add spa-deploy-cli@poviolabs/spa-deploy-cli#v4.1
-```
-
-or install globally
-
-```bash
-npm i -g spa-deploy-cli@poviolabs/spa-deploy-cli#v4.1 --force
+yarn add @povio/spa-deploy-cli
 ```
 
 # Configure
 
 ```yaml
+accountId: "000000000000"
 region: us-east-1
-accountId: 000000000000
 
 # Static SPA deploy config
 deploy:
@@ -85,9 +79,6 @@ configs:
     
       - name: database__host
         valueFrom: env:DATABASE_HOST
-
-
-
 ```
 
 ### Example
@@ -144,6 +135,10 @@ yarn spa-deploy deploy --stage myapp-stg
 ## Test locally
 
 ```bash
+# prerequisites
+corepack install
+yarn
+
 # run tests
 yarn test
 
