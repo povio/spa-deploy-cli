@@ -1,13 +1,12 @@
-import { test } from "node:test";
+import { test } from "vitest";
 import { generateIni } from "./bootstrap";
-import assert from "assert";
 import { resolveZeConfigItem } from "../helpers/ze-config";
 
 const __dirname = new URL(".", import.meta.url).pathname;
 
 process.env.APP_VERSION = "0.0.1";
 
-test("bootstrap env", async () => {
+test("bootstrap env", async ({ expect }) => {
   //const destination = "./.test-example.env";
 
   const data = await resolveZeConfigItem(
@@ -35,8 +34,7 @@ test("bootstrap env", async () => {
     "myapp-dev",
   );
 
-  assert.equal(
-    generateIni(data),
+  expect(generateIni(data)).toEqual(
     `APP_RELEASE="semiprecious"
 APP_STAGE="myapp-dev"
 APP_VERSION="0.0.1"

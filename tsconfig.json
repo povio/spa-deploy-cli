@@ -18,4 +18,5 @@
     "noImplicitAny": true
   },
   "include": ["src/**/*.ts", "test/**/*.test.ts"],
+  "exclude": ["node_modules","dist",".tmp","examples"]
 }

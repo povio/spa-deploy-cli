@@ -1,8 +1,7 @@
-import { test } from "node:test";
+import { test } from "vitest";
 import { resolveZeConfigItem } from "../src/helpers/ze-config";
-import assert from "assert";
 
-test("ze-config", async () => {
+test("ze-config", async ({ expect }) => {
   process.env.MYAPP_RECORD1 = "value 1";
   process.env.MYAPP_RECORD2 = "value 2";
   process.env.MYAPP_RECORD3 = "value 3";
@@ -35,7 +34,7 @@ test("ze-config", async () => {
     stage,
   );
 
-  assert.deepStrictEqual(config, {
+  expect(config).toEqual({
     database: {
       name: "test",
       username2: "test",

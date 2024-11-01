@@ -58,7 +58,7 @@ export function getBuilder(options: any) {
 export function getYargsOptions<T>(target: any): Record<keyof T, Options> {
   return Object.entries(getYargsOption(target)).reduce(
     (a, [property, options]) => {
-      // @ts-ignore
+      // @ts-expect-error - todo
       a[property] = Object.fromEntries(
         Object.entries(options).filter(
           ([optionName]) => !["envAlias", "default"].includes(optionName),

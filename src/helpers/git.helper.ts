@@ -11,7 +11,9 @@ export async function getGitVersion(pwd: string) {
   try {
     const git = await simpleGit(pwd);
     return (await git.raw("--version")).trim();
-  } catch (e) {
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: any) {
     return undefined;
   }
 }

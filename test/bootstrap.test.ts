@@ -1,14 +1,13 @@
-import { test } from "node:test";
+import { test } from "vitest";
 import { bootstrap } from "../src/commands/bootstrap";
 import fs from "fs";
 import path from "path";
-import assert from "assert";
 
 const __dirname = new URL(".", import.meta.url).pathname;
 
 process.env.APP_VERSION = "0.0.1";
 
-test.skip("inject from config", async () => {
+test.skip("inject from config", async ({ expect }) => {
   await bootstrap({
     verbose: true,
     pwd: new URL(".", import.meta.url).pathname,
@@ -21,8 +20,7 @@ test.skip("inject from config", async () => {
     "utf-8",
   );
   fs.unlinkSync(path.join(__dirname, ".test-example.env"));
-  assert.equal(
-    output,
+  expect(output).toEqual(
     `APP_RELEASE=xxxxxxxxx
 APP_STAGE=nextjs
 APP_VERSION=0.0.1
