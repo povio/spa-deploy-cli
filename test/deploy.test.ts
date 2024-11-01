@@ -234,15 +234,14 @@ describe("deploy command", ({ skip }) => {
   });
 
   test("deploy include/exclude", async ({ expect }) => {
+    const prefix = `test-${Math.random().toString(36).substring(7)}/`;
+
     {
       const results = await deployTarget(
         "default",
         makeConfig({
           includeGlob: ["**/*.(css|ico)"],
-          ignoreGlob: [
-            // ignore other tests
-            "test*/**",
-          ],
+          s3: { prefix },
         }),
         { ...testArgs, dryRun: true },
       );
@@ -254,11 +253,39 @@ describe("deploy command", ({ skip }) => {
       expect(items).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            key: `global.css`,
+            key: `${prefix}global.css`,
             action: "Create",
           }),
           expect.objectContaining({
-            key: "favicon.ico",
+            key: `${prefix}global.css`,
+            action: "Create",
+          }),
+        ]),
+      );
+      expect(items.length).toBe(2);
+    }
+    {
+      const results = await deployTarget(
+        "default",
+        makeConfig({
+          ignoreGlob: ["*.html"],
+          s3: { prefix },
+        }),
+        { ...testArgs, dryRun: true },
+      );
+      const items = results?.s3SyncPlan?.items.filter(
+        (x) => x.action !== "Ignore",
+      );
+      expect(items).toBeDefined();
+      if (!items) return;
+      expect(items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: `${prefix}global.css`,
+            action: "Create",
+          }),
+          expect.objectContaining({
+            key: `${prefix}favicon.ico`,
             action: "Create",
           }),
         ]),
@@ -286,11 +313,9 @@ describe("deploy command", ({ skip }) => {
         expect.arrayContaining([
           expect.objectContaining({
             key: `global.css`,
-            action: "Create",
           }),
           expect.objectContaining({
-            key: "favicon.ico",
-            action: "Create",
+            key: `favicon.ico`,
           }),
         ]),
       );
