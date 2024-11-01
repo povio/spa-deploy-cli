@@ -53,6 +53,13 @@ deploy:
         # ignore s3 changes for invalidation
         #skipChangesInvalidation: false
           
+        cacheControl: "max-age=2628000, public"
+        
+        # pattern match cache control, first match wins, default is cacheControl
+        #cacheControlGlob:
+        # - glob: "*.html"
+        #   cacheControl: "no-cache, no-store, must-revalidate"
+          
     cloudfront:
         distributionId: CF000000000000
         invalidatePaths: "/*"

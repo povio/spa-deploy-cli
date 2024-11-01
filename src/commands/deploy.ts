@@ -125,6 +125,8 @@ export async function deployTarget(
         invalidateGlob: d.s3.invalidateGlob,
         acl: d.s3.acl,
         invalidateChanges: !(d.s3.skipChangesInvalidation === true),
+        cacheControl: d.s3.cacheControl,
+        cacheControlGlob: d.s3.cacheControlGlob,
       },
     );
 
@@ -270,6 +272,17 @@ export const DeployConfigItem = z.object({
         .optional(),
 
       acl: z.string().optional(),
+
+      cacheControl: z.string().default("max-age=2628000, public").optional(),
+
+      cacheControlGlob: z
+        .array(
+          z.object({
+            glob: z.string(),
+            cacheControl: z.string(),
+          }),
+        )
+        .optional(),
     })
     .optional(),
 

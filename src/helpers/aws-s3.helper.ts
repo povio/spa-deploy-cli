@@ -47,6 +47,7 @@ export interface SyncS3Options {
   force?: boolean;
   /**
    * If true, matched files are not cached and are invalidated on deploy
+   * @deprecated use cacheControlGlob instead
    */
   invalidateGlob?: string[];
   /**
@@ -55,6 +56,9 @@ export interface SyncS3Options {
   invalidateChanges?: boolean;
 
   acl?: string;
+
+  cacheControl?: string;
+  cacheControlGlob?: { glob: string; cacheControl: string }[];
 }
 
 export interface S3File {
@@ -119,7 +123,16 @@ export function printS3SyncPlan(
 ) {
   const output: string[] = [];
   for (const item of plan.items) {
-    const { key, action, invalidate, cache, local, contentType, data } = item;
+    const {
+      key,
+      action,
+      invalidate,
+      cache,
+      local,
+      contentType,
+      data,
+      cacheControl,
+    } = item;
     if (!verbose) {
       if (action == SyncAction.unchanged) {
         continue;
@@ -133,9 +146,14 @@ export function printS3SyncPlan(
     const line = [
       SyncActionColors[action](action.padEnd(9, " ")),
       [
-        invalidate ? chk.magenta("Invalidate") : "          ",
-        cache ? (action == SyncAction.unchanged ? "Cached" : "Cache") : "     ",
-        data !== undefined ? "DATA  " : "      ",
+        (invalidate ? chk.magenta("Invalidate") : "").padEnd(10, " "),
+        (cache
+          ? action == SyncAction.unchanged
+            ? "Cached"
+            : `"${cacheControl}"`
+          : ""
+        ).padEnd(25, " "),
+        (data !== undefined ? "DATA  " : "").padEnd(6, " "),
         // local?.hash,
         // remote?.eTag,
       ].join("\t"),
@@ -169,25 +187,31 @@ export async function prepareS3SyncPlan(
       acl: s3Options.acl,
     };
 
-    if (s3Options.invalidateGlob && mm.isMatch(key, s3Options.invalidateGlob)) {
-      itemsDict[key] = {
-        key,
-        ...planItem,
-        cacheControl: "public, must-revalidate",
-        invalidate: false,
-        cache: false,
-        ...(itemsDict[key] ? itemsDict[key] : {}),
-      };
-    } else {
-      itemsDict[key] = {
-        key: key,
-        ...planItem,
-        cacheControl: "max-age=2628000, public",
-        invalidate: false,
-        cache: true,
-        ...(itemsDict[key] ? itemsDict[key] : {}),
-      };
+    let cacheControl = s3Options.cacheControl || "max-age=2628000, public";
+
+    if (s3Options.cacheControlGlob) {
+      for (const { glob, cacheControl: cc } of s3Options.cacheControlGlob) {
+        console.log(key, glob, cc);
+        if (mm.isMatch(key, glob)) {
+          cacheControl = cc;
+        }
+      }
     }
+
+    if (s3Options.invalidateGlob && mm.isMatch(key, s3Options.invalidateGlob)) {
+      cacheControl = "public, must-revalidate";
+    }
+
+    const cache = cacheControl.includes("max-age");
+
+    itemsDict[key] = {
+      key,
+      ...planItem,
+      cacheControl,
+      invalidate: false,
+      cache,
+      ...(itemsDict[key] ? itemsDict[key] : {}),
+    };
   }
 
   const client = getS3ClientInstance({
