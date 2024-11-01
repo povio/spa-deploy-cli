@@ -18,6 +18,14 @@ Examples:
 
 # Setup
 
+Running without installing. Make sure to lock the version, check the latest version on npm.
+
+```
+yarn dlx @povio/spa-deploy-cli@4.1.0
+```
+
+If using yarn cache, you can install the package:
+
 ```bash
 yarn add @povio/spa-deploy-cli
 ```

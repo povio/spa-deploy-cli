@@ -159,6 +159,8 @@ export async function prepareS3SyncPlan(
 
   // find local files
   for await (const file of scanLocal(localOptions)) {
+    const key = s3Options.prefix ? s3Options.prefix + file.key : file.key;
+
     const planItem = {
       local: file,
       contentDisposition: "inline",
@@ -167,26 +169,23 @@ export async function prepareS3SyncPlan(
       acl: s3Options.acl,
     };
 
-    if (
-      s3Options.invalidateGlob &&
-      mm.isMatch(file.key, s3Options.invalidateGlob)
-    ) {
-      itemsDict[file.key] = {
-        key: file.key,
+    if (s3Options.invalidateGlob && mm.isMatch(key, s3Options.invalidateGlob)) {
+      itemsDict[key] = {
+        key,
         ...planItem,
         cacheControl: "public, must-revalidate",
         invalidate: false,
         cache: false,
-        ...(itemsDict[file.key] ? itemsDict[file.key] : {}),
+        ...(itemsDict[key] ? itemsDict[key] : {}),
       };
     } else {
-      itemsDict[file.key] = {
-        key: file.key,
+      itemsDict[key] = {
+        key: key,
         ...planItem,
         cacheControl: "max-age=2628000, public",
         invalidate: false,
         cache: true,
-        ...(itemsDict[file.key] ? itemsDict[file.key] : {}),
+        ...(itemsDict[key] ? itemsDict[key] : {}),
       };
     }
   }
