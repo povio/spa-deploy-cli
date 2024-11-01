@@ -1,11 +1,11 @@
 region: us-east-1
 accountId: "00000000000"
 
-bootstrap:
-  destination: ./.test-example.env
+configs:
+  destination: ./.myapp-dev.resolved.env
   values:
     - name: "@"
-      configFrom: environment
+      configFrom: template
 
 deploy:
   buildPath: "./app"

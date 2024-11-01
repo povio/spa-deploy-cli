@@ -18,7 +18,7 @@ test("ze-config", async ({ expect }) => {
         { name: "database__password", valueFrom: "env:MYAPP_RECORD3" },
         {
           name: "@",
-          configFrom: "environment",
+          configFrom: "template",
         },
         //{
         //  name: "@",

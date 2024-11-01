@@ -7,7 +7,7 @@ const __dirname = new URL(".", import.meta.url).pathname;
 
 process.env.APP_VERSION = "0.0.1";
 
-test.skip("inject from config", async ({ expect }) => {
+test("inject from config", async ({ expect }) => {
   await bootstrap({
     verbose: true,
     pwd: new URL(".", import.meta.url).pathname,
@@ -15,26 +15,31 @@ test.skip("inject from config", async ({ expect }) => {
     release: "xxxxxxxxx",
   });
 
-  const output = fs.readFileSync(
-    path.join(__dirname, ".test-example.env"),
-    "utf-8",
-  );
-  fs.unlinkSync(path.join(__dirname, ".test-example.env"));
+  const outputPath = path.join(__dirname, ".myapp-dev.resolved.env");
+  const output = fs.readFileSync(outputPath, "utf-8");
+  fs.unlinkSync(outputPath);
   expect(output).toEqual(
-    `APP_RELEASE=xxxxxxxxx
-APP_STAGE=nextjs
-APP_VERSION=0.0.1
-STATIC_URL=https://static.example.com
-NEXT_PUBLIC_SENTRY_CDN=https://public@sentry.example.com/1`,
+    `APP_RELEASE="xxxxxxxxx"
+APP_STAGE="myapp-dev"
+APP_VERSION="0.0.1"
+STATIC_URL="https://static.example.com"
+NEXT_PUBLIC_SENTRY_CDN="https://public@sentry.example.com/1"`,
   );
 });
 
-test.skip("inject from html", async () => {
+test("inject from html", async ({ expect }) => {
+  const outputPath = path.join(__dirname, "myapp-stg.final.html");
   await bootstrap({
     verbose: true,
     pwd: new URL(".", import.meta.url).pathname,
     stage: "myapp-stg",
     release: "xxxxxxxxx",
   });
-  fs.unlinkSync(path.join(__dirname, "test-example.html"));
+
+  const output = fs.readFileSync(outputPath, "utf-8");
+  fs.unlinkSync(outputPath);
+
+  expect(output).toContain(
+    '<script id="env-data">window.__ENV__ = {"APP_RELEASE":"xxxxxxxxx","APP_STAGE":"myapp-stg","APP_VERSION":"0.0.1","STATIC_URL":"https://static.example.com","NEXT_PUBLIC_SENTRY_CDN":"https://public@sentry.example.com/1"}</script>',
+  );
 });
