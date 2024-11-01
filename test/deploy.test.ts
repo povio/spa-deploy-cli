@@ -1,12 +1,6 @@
 import { test, describe, afterAll, beforeAll } from "vitest";
 import { join } from "node:path";
-import {
-  mkdirSync,
-  copyFileSync,
-  rmSync,
-  writeFileSync,
-  readFileSync,
-} from "node:fs";
+import { mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
 import {
   deployTarget,
   getDeployConfig,
@@ -69,7 +63,7 @@ describe("deploy command", ({ skip }) => {
     ci: true,
   };
 
-  test("deploy", async ({ expect, skip }) => {
+  test("deploy", async ({ expect }) => {
     const prefix = `test-${Math.random().toString(36).substring(7)}/`;
 
     {
@@ -152,7 +146,7 @@ describe("deploy command", ({ skip }) => {
     }
   });
 
-  test("deploy with cacheControl", async ({ expect, skip }) => {
+  test("deploy with cacheControl", async ({ expect }) => {
     const prefix = `test-${Math.random().toString(36).substring(7)}/`;
 
     {
@@ -236,6 +230,71 @@ describe("deploy command", ({ skip }) => {
           ]),
         }),
       );
+    }
+  });
+
+  test("deploy include/exclude", async ({ expect }) => {
+    {
+      const results = await deployTarget(
+        "default",
+        makeConfig({
+          includeGlob: ["**/*.(css|ico)"],
+          ignoreGlob: [
+            // ignore other tests
+            "test*/**",
+          ],
+        }),
+        { ...testArgs, dryRun: true },
+      );
+      const items = results?.s3SyncPlan?.items.filter(
+        (x) => x.action !== "Ignore",
+      );
+      expect(items).toBeDefined();
+      if (!items) return;
+      expect(items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: `global.css`,
+            action: "Create",
+          }),
+          expect.objectContaining({
+            key: "favicon.ico",
+            action: "Create",
+          }),
+        ]),
+      );
+      expect(items.length).toBe(2);
+    }
+    {
+      const results = await deployTarget(
+        "default",
+        makeConfig({
+          ignoreGlob: [
+            "*.html",
+            // ignore other tests
+            "test*/**",
+          ],
+        }),
+        { ...testArgs, dryRun: true },
+      );
+      const items = results?.s3SyncPlan?.items.filter(
+        (x) => x.action !== "Ignore",
+      );
+      expect(items).toBeDefined();
+      if (!items) return;
+      expect(items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: `global.css`,
+            action: "Create",
+          }),
+          expect.objectContaining({
+            key: "favicon.ico",
+            action: "Create",
+          }),
+        ]),
+      );
+      expect(items.length).toBe(2);
     }
   });
 });

@@ -34,6 +34,7 @@ export async function deploy(argv: {
   purge?: boolean;
   force?: boolean;
   ci?: boolean;
+  dryRun?: boolean;
 }): Promise<void> {
   const config = await getDeployConfig(argv);
   for (const d of config.deploy) {
@@ -53,6 +54,7 @@ export async function deployTarget(
     purge?: boolean;
     force?: boolean;
     verbose?: boolean;
+    dryRun?: boolean;
   },
 ): Promise<{
   s3SyncPlan?: S3SyncPlan;
@@ -172,6 +174,15 @@ export async function deployTarget(
     if (cloudfrontIds.length < 1) {
       logWarning(`Cloudfront distributionId is not set`);
     }
+  }
+
+  if (argv.dryRun) {
+    logInfo("Dry run, skipping deployment");
+    return {
+      s3SyncPlan,
+      cloudfrontInvalidations,
+      result: "success",
+    };
   }
 
   if (!argv.ci) {

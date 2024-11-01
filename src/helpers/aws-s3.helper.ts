@@ -133,14 +133,18 @@ export function printS3SyncPlan(
       data,
       cacheControl,
     } = item;
-    if (!verbose) {
-      if (action == SyncAction.unchanged) {
-        continue;
-      }
-    }
-
     if (!action) {
       throw new Error(`Action not defined for ${key}`);
+    }
+
+    if (!verbose) {
+      if (
+        [SyncAction.unchanged, SyncAction.ignore, SyncAction.unknown].includes(
+          action,
+        )
+      ) {
+        continue;
+      }
     }
 
     const line = [
@@ -223,17 +227,17 @@ export async function prepareS3SyncPlan(
     bucket: s3Options.bucket,
     prefix: s3Options.prefix,
   })) {
-    const action = s3Options.purge ? SyncAction.delete : SyncAction.unknown;
-
-    //if (localOptions.ignoreGlob && isMatch(key, localOptions.ignoreGlob)) {
-    //  action = SyncAction.ignore;
-    //}
+    let action = s3Options.purge ? SyncAction.delete : SyncAction.unknown;
 
     if (!file.Key) {
       throw new Error(`File Key not defined for ${JSON.stringify(file)}`);
     }
 
     const key = file.Key;
+
+    if (localOptions.ignoreGlob && mm.isMatch(key, localOptions.ignoreGlob)) {
+      action = SyncAction.ignore;
+    }
 
     if (!file.ETag) {
       throw new Error(`File Etag not defined for ${JSON.stringify(file)}`);

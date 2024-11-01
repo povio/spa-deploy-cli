@@ -34,6 +34,9 @@ class DeployOptions implements YargsOptions {
 
   @YargOption({ describe: "Replace all files even if not changed" })
   force!: boolean;
+
+  @YargOption({ describe: "Dry run" })
+  dryRun!: boolean;
 }
 
 export const command: yargs.CommandModule = {
@@ -65,6 +68,7 @@ export const command: yargs.CommandModule = {
       purge: argv.purge,
       force: argv.force,
       ci: argv.ci,
+      dryRun: argv.dryRun,
     });
   },
 };

@@ -1,7 +1,7 @@
 import fg from "fast-glob";
 import { createHash } from "crypto";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import { join } from "node:path";
 import { chk } from "./chalk.helper";
 
 export enum SyncAction {
@@ -38,17 +38,21 @@ export interface ScanLocalOptions {
 export async function* scanLocal(
   options: ScanLocalOptions,
 ): AsyncGenerator<LocalFile> {
-  for await (const entry of fg.globSync(options.includeGlob || ["**"], {
-    onlyFiles: true,
-    ignore: options.ignoreGlob,
-    cwd: options.path,
-    unique: true,
-  })) {
-    const absPath = path.join(options.path, entry);
+  for await (const { stats, path } of fg.globSync(
+    options.includeGlob || ["**"],
+    {
+      onlyFiles: true,
+      ignore: options.ignoreGlob,
+      cwd: options.path,
+      unique: true,
+      stats: true,
+    },
+  )) {
+    const absPath = join(options.path, path);
     yield {
       path: absPath,
-      key: entry,
-      size: fs.statSync(absPath).size,
+      key: path,
+      size: stats?.size || fs.statSync(absPath).size,
       hash: await fileMd5(absPath),
     };
   }

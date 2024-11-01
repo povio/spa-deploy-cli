@@ -11,8 +11,10 @@ configs:
 deploy:
   buildPath: "./dist"
 
-  #includeGlob: "**"
-  #ignoreGlob:
+  #includeGlob:
+  #  - "**/*.css"
+  #  - "**/*.js"
+  #ignoreGlob: "other/*"
 
   s3:
     acl: "public-read"

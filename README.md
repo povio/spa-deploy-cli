@@ -167,4 +167,8 @@ yarn build
 # test build
 yarn start:prod --help
 yarn start:dist bootstrap --pwd ./test --stage myapp-dev
+
+# test deploy
+yarn start:dist deploy --pwd ./test --stage myapp-dev
+
 ```
