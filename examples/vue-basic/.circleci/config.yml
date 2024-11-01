@@ -18,7 +18,7 @@ jobs:
 
       ## only install spa-deploy-cli (call without yarn)
       # - run:
-      #     command: yarn dlx povio/spa-deploy-cli@^4.1
+      #     command: yarn dlx povio/spa-deploy-cli@^4.2
 
 
       # Run tests/eslint

@@ -21,7 +21,7 @@ Examples:
 Running without installing. Make sure to lock the version, check the latest version on npm.
 
 ```
-yarn dlx @povio/spa-deploy-cli@4.1.0
+yarn dlx @povio/spa-deploy-cli@4.2
 ```
 
 If using yarn cache, you can install the package:
