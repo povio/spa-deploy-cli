@@ -39,26 +39,44 @@ region: us-east-1
 # Static SPA deploy config
 deploy:
     buildPath: "./dist"
-    #includeGlob: "**"
-    #ignoreGlob:
+      
+    # only include local files matching this glob
+    #includeGlob: 
+    # - glob: "**.css"
+    #   cacheControl: "max-age=2628000, public"
+      
+    # exclude local and remote files matching this glob
+    #ignoreGlob: "**.css"
         
     s3:
-        acl: "public-read"
         bucket: myapp-dev-website
+        
+        # prefix to upload to, default is root
         #prefix:
-        purge: false
-        force: false
-        # extra glob for invalidation
-        #invalidateGlob: 
-        # ignore s3 changes for invalidation
+        
+        # delete all ignored/unknown files
+        #  use `--dry-run` to see what would be deleted
+        #purge: false
+        
+        # re-upload even if the file is the same (also updates cacheControl)
+        #force: false
+
+        # changes should not invalidate cloudfront cache
         #skipChangesInvalidation: false
-          
-        cacheControl: "max-age=2628000, public"
+        
+        # default cache control
+        #cacheControl: "max-age=2628000, public"
         
         # pattern match cache control, first match wins, default is cacheControl
         #cacheControlGlob:
         # - glob: "*.html"
         #   cacheControl: "no-cache, no-store, must-revalidate"
+        
+        # @deprecated - set matching files to "public, must-revalidate"
+        #invalidateGlob: "*.html"
+        
+        # set ACL, not needed if using bucket policy
+        #acl: "public-read"
           
     cloudfront:
         distributionId: CF000000000000
